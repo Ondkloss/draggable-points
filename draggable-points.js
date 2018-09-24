@@ -26,10 +26,10 @@
     /**
      * Filter by dragMin and dragMax
      */
-    function filterRange(newY, series, XOrY) {
+    function filterRange(newY, point, series, XOrY) {
         var options = series.options,
-            dragMin = pick(options['dragMin' + XOrY], undefined),
-            dragMax = pick(options['dragMax' + XOrY], undefined),
+            dragMin = pick(options.dragMin ? options.dragMin(XOrY, point) : undefined, options['dragMin' + XOrY], undefined),
+            dragMax = pick(options.dragMax ? options.dragMax(XOrY, point) : undefined, options['dragMax' + XOrY], undefined),
             precision = pick(options['dragPrecision' + XOrY], undefined);
 
         if (!isNaN(precision)) {
@@ -90,15 +90,15 @@
                 newY = dragY === undefined ? dragPoint.y : series.yAxis.toValue(newPlotY, true),
                 ret;
 
-            newX = filterRange(newX, series, 'X');
-            newY = filterRange(newY, series, 'Y');
+            newX = filterRange(newX, dragPoint, series, 'X');
+            newY = filterRange(newY, dragPoint, series, 'Y');
             if (dragPoint.low) {
                 var newPlotHigh = dragPlotHigh - deltaY,
                     newPlotLow = dragPlotLow - deltaY;
                 newHigh = dragY === undefined ? dragPoint.high : series.yAxis.toValue(newPlotHigh, true);
                 newLow = dragY === undefined ? dragPoint.low : series.yAxis.toValue(newPlotLow, true);
-                newHigh = filterRange(newHigh, series, 'Y');
-                newLow = filterRange(newLow, series, 'Y');
+                newHigh = filterRange(newHigh, dragPoint, series, 'Y');
+                newLow = filterRange(newLow, dragPoint, series, 'Y');
             }
             if (Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) > dragSensitivity) {
                 return {
