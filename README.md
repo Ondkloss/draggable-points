@@ -1,3 +1,12 @@
+Modifications
+================
+This is a minor tweak to Draggable Points by Highcharts, allowing for `dragMin` and `dragMax` functions for a series, to more dynamically control the min and max values depending on axis and the point being dragged.
+
+The options below have been edited to reflect the two additions.
+
+Online demos:
+* [Line series](http://jsfiddle.net/6g9tqrh5/9/)
+
 Draggable Points for Highcharts
 ================
 This plugin allows the user to drag the points in the chart, making them able to edit data directly in the chart.
@@ -22,6 +31,8 @@ Online demos:
 | `plotOptions.series.dragHandlePath` | Function | Column series only. A custom path for the drag handle. |
 | `plotOptions.series.dragHandleFill` | Function | Column series only. Fill color for the drag handle. |
 | `plotOptions.series.dragHandleStroke` | Function | Column series only. Stroke color for the drag handle. |
+| `plotOptions.series.dragMax` | Function | The maximum value to drag to for the given `point` along `XorY`. |
+| `plotOptions.series.dragMin` | Function | The minimum value to drag to for the given `point` along `XorY`. |
 | `plotOptions.series.dragMaxX` | Number | The maximum X value to drag to for this series. |
 | `plotOptions.series.dragMaxY` | Number | The maximum Y value to drag to for this series. |
 | `plotOptions.series.dragMinX` | Number | The minimum X value to drag to for this series. |
