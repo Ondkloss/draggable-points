@@ -22,25 +22,53 @@
         pick = Highcharts.pick,
         columnProto = Highcharts.seriesTypes.column.prototype;
 
+    /**
+     * Adjust value according to step size
+     */
+    function dragStepAdjustment(value, prevValue, stepSize, relative) {
+        if (stepSize === undefined) {
+            return value;
+        }
+
+        const midpoint = stepSize / 2;
+        const modulus = relative === true ? (value - prevValue) % stepSize : value % stepSize;
+        return modulus > midpoint ? value + (stepSize - modulus) : value - modulus;
+    }
 
     /**
      * Filter by dragMin and dragMax
      */
-    function filterRange(newY, series, XOrY) {
+    function filterRange(newY, point, series, stepSize, XOrY) {
         var options = series.options,
             dragMin = pick(options['dragMin' + XOrY], undefined),
             dragMax = pick(options['dragMax' + XOrY], undefined),
-            precision = pick(options['dragPrecision' + XOrY], undefined);
+            precision = pick(options['dragPrecision' + XOrY], undefined),
+            allowMinMax = options.dragStepAllowMinMax === true;
 
         if (!isNaN(precision)) {
             newY = Math.round(newY / precision) * precision;
         }
 
         if (newY < dragMin) {
-            newY = dragMin;
+            if (stepSize !== undefined) {
+                allowMinMax ? newY = dragMin : newY += stepSize;
+            }
+            else {
+                newY = dragMin;
+            }
         } else if (newY > dragMax) {
-            newY = dragMax;
+            if (stepSize !== undefined) {
+                allowMinMax ? newY = dragMax : newY -= stepSize;
+            }
+            else {
+                newY = dragMax;
+            }
         }
+
+        if (newY < dragMin || newY > dragMax) {
+            newY = 'X' == XOrY ? point.x : point.y;
+        }
+
         return newY;
     }
 
@@ -88,17 +116,21 @@
                 newPlotY = dragPlotY - deltaY,
                 newX = dragX === undefined ? dragPoint.x : series.xAxis.toValue(newPlotX, true),
                 newY = dragY === undefined ? dragPoint.y : series.yAxis.toValue(newPlotY, true),
+                dragStepSizeX = pick(series.options.dragStepSize ? series.options.dragStepSize('X', dragPoint) : undefined, series.options.dragStepSizeX, undefined),
+                dragStepSizeY = pick(series.options.dragStepSize ? series.options.dragStepSize('Y', dragPoint) : undefined, series.options.dragStepSizeY, undefined),
                 ret;
 
-            newX = filterRange(newX, series, 'X');
-            newY = filterRange(newY, series, 'Y');
+            newX = dragStepAdjustment(newX, dragPoint.x, dragStepSizeX, series.options.dragStepRelative);
+            newY = dragStepAdjustment(newY, dragPoint.y, dragStepSizeY, series.options.dragStepRelative);
+            newX = filterRange(newX, dragPoint, series, dragStepSizeX, 'X');
+            newY = filterRange(newY, dragPoint, series, dragStepSizeY, 'Y');
             if (dragPoint.low) {
                 var newPlotHigh = dragPlotHigh - deltaY,
                     newPlotLow = dragPlotLow - deltaY;
                 newHigh = dragY === undefined ? dragPoint.high : series.yAxis.toValue(newPlotHigh, true);
                 newLow = dragY === undefined ? dragPoint.low : series.yAxis.toValue(newPlotLow, true);
-                newHigh = filterRange(newHigh, series, 'Y');
-                newLow = filterRange(newLow, series, 'Y');
+                newHigh = filterRange(newHigh, dragPoint, series, dragStepSizeY, 'Y');
+                newLow = filterRange(newLow, dragPoint, series, dragStepSizeY, 'Y');
             }
             if (Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) > dragSensitivity) {
                 return {
