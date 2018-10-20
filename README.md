@@ -40,6 +40,11 @@ Online demos:
 | `plotOptions.series.dragPrecisionX` | Number | The X precision value to drag to for this series. |
 | `plotOptions.series.dragPrecisionY` | Number |The Y precision value to drag to for this series.  |
 | `plotOptions.series.dragSensitivity` | Number | The amount of pixels to drag the pointer before it counts as a drag operation. This prevents drag/drop to fire when just clicking or selecting points. Defaults to 1. |
+| `plotOptions.series.dragStepAllowMinMax` | Boolean | Allow dragging to min/max if step is set, or enforce steps?  |
+| `plotOptions.series.dragStepSize` | Function | The step size for the given `point` along `XorY`.  |
+| `plotOptions.series.dragStepSizeX` | Number | The drag step size for the X axis.  |
+| `plotOptions.series.dragStepSizeY` | Number | The drag step size for the Y axis.  |
+| `plotOptions.series.dragStepRelative` | Boolean | Should steps be done relative to points starting value?  |
 | `plotOptions.series.point.events.drag` | Function | Callback that fires while dragging. Temporary point values can be read from `e.newX` and `e.newY`. Original values are available in `e.dragStart`. |
 | `plotOptions.series.point.events.drop` | Function | Callback that fires when the point is dropped. Original values are available in `e.dragStart`. The `Point` object is the context. Return false to cancel the drop. |
 
